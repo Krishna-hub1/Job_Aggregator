@@ -1,0 +1,42 @@
+CREATE DATABASE job_aggregator;
+USE job_aggregator;
+
+CREATE TABLE companies (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    website VARCHAR(500),
+    ats_platform ENUM('greenhouse', 'lever', 'ashby', 'workday', 'other'),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_company (name, ats_platform)
+);
+
+CREATE TABLE jobs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    location VARCHAR(255),
+    job_type ENUM('full-time', 'part-time', 'contract', 'internship'),
+    experience_level ENUM('intern', 'entry', 'mid', 'senior', 'lead', 'executive'),
+    salary_min INT,
+    salary_max INT,
+    description TEXT,
+    apply_url VARCHAR(500) NOT NULL,
+    remote BOOLEAN DEFAULT FALSE,
+    posted_at DATE,
+    scraped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_job (company_id, apply_url),
+    INDEX idx_title (title),
+    INDEX idx_location (location),
+    INDEX idx_posted (posted_at)
+);
+
+CREATE TABLE saved_jobs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    job_id INT NOT NULL,
+    status ENUM('saved', 'applied', 'interviewing', 'rejected', 'offer') DEFAULT 'saved',
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE
+);
