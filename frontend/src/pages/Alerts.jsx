@@ -1,2 +1,66 @@
-import {useEffect,useState} from 'react'; import {Bell,Plus,Trash2} from 'lucide-react'; import {api} from '../services/api';
-export default function Alerts(){const[alerts,setAlerts]=useState([]);const[form,setForm]=useState({name:'Developer jobs',keywords:'Python',location:'',job_type:'',remote:false,frequency:'daily'});const[loading,setLoading]=useState(true);const load=()=>api.getAlerts().then(r=>setAlerts(r.data)).finally(()=>setLoading(false));useEffect(()=>{load()},[]);const create=async e=>{e.preventDefault();const r=await api.createAlert(form);setAlerts([r.data,...alerts])};const toggle=id=>api.updateAlert(id,{is_active:!alerts.find(a=>a.id===id).is_active}).then(r=>setAlerts(alerts.map(a=>a.id===id?r.data:a)));const remove=id=>api.deleteAlert(id).then(()=>setAlerts(alerts.filter(a=>a.id!==id)));return <div className="simple-page"><div className="page-heading"><div><p>AUTOMATION</p><h1>Job Alerts</h1><span>Save a search and check it whenever new listings arrive.</span></div></div><form className="alert-builder" onSubmit={create}><div className="form-grid"><label>Alert name<input value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></label><label>Keywords<input value={form.keywords} onChange={e=>setForm({...form,keywords:e.target.value})}/></label><label>Location<input value={form.location} onChange={e=>setForm({...form,location:e.target.value})}/></label><label>Job type<select value={form.job_type} onChange={e=>setForm({...form,job_type:e.target.value})}><option value="">Any type</option><option value="full-time">Full Time</option><option value="internship">Internship</option><option value="contract">Contract</option></select></label><label>Frequency<select value={form.frequency} onChange={e=>setForm({...form,frequency:e.target.value})}><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="instant">Instant</option></select></label><label className="check"><input type="checkbox" checked={form.remote} onChange={e=>setForm({...form,remote:e.target.checked})}/> Remote only</label></div><button className="apply-now"><Plus size={15}/> Create alert</button></form><div className="alert-list">{loading?<div className="page-card">Loading alerts...</div>:!alerts.length?<div className="page-card"><Bell size={38}/><h3>No alerts yet</h3><p>Create one above to keep a saved search.</p></div>:alerts.map(a=><div className="alert-row" key={a.id}><Bell size={22}/><div><b>{a.name}</b><p>{a.keywords||'Any role'} {a.location&&`· ${a.location}`} {a.remote&&'· Remote'}</p><small>{a.frequency} · {a.is_active?'Active':'Paused'}</small></div><button onClick={()=>toggle(a.id)} className={`toggle ${a.is_active?'on':''}`}>{a.is_active?'Active':'Paused'}</button><button className="save-icon" onClick={()=>remove(a.id)}><Trash2 size={18}/></button></div>)}</div></div>}
+import {useEffect,useState} from 'react'; 
+import {Bell,Plus,Trash2} from 'lucide-react'; 
+import {api} from '../services/api';
+export default function Alerts(){
+    const[alerts,setAlerts]=useState([]);
+    const[form,setForm]=useState({name:'Developer jobs',keywords:'Python',location:'',job_type:'',remote:false,frequency:'daily'});
+    const[loading,setLoading]=useState(true);
+    const load=()=>api.getAlerts().then(r=>setAlerts(r.data)).finally(()=>setLoading(false));
+    useEffect(()=>{load()},[]);
+    const create=async e=>{e.preventDefault();
+        const r=await api.createAlert(form);
+        setAlerts([r.data,...alerts])};
+        const toggle=id=>api.updateAlert(id,{is_active:!alerts.find(a=>a.id===id).is_active}).then(r=>setAlerts(alerts.map(a=>a.id===id?r.data:a)));
+        const remove=id=>api.deleteAlert(id).then(()=>setAlerts(alerts.filter(a=>a.id!==id)));
+        return <div className="simple-page">
+            <div className="page-heading">
+                <div><p>AUTOMATION</p>
+                <h1>Job Alerts</h1>
+                <span>Save a search and check it whenever new listings arrive.</span>
+                </div>
+                </div>
+                <form className="alert-builder" onSubmit={create}>
+                    <div className="form-grid">
+                        <label>Alert name<input value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/>
+                        </label>
+                        <label>Keywords<input value={form.keywords} onChange={e=>setForm({...form,keywords:e.target.value})}/>
+                        </label>
+                        <label>Location<input value={form.location} onChange={e=>setForm({...form,location:e.target.value})}/>
+                        </label>
+                        <label>Job type<select value={form.job_type} onChange={e=>setForm({...form,job_type:e.target.value})}>
+                            <option value="">Any type</option>
+                            <option value="full-time">Full Time</option>
+                            <option value="internship">Internship</option>
+                            <option value="contract">Contract</option>
+                            </select>
+                            </label>
+                            <label>Frequency<select value={form.frequency} onChange={e=>setForm({...form,frequency:e.target.value})}>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="instant">Instant</option>
+                                </select>
+                                </label>
+                                <label className="check">
+                                    <input type="checkbox" checked={form.remote} onChange={e=>setForm({...form,remote:e.target.checked})}/> Remote only</label>
+                                    </div>
+                                    <button className="apply-now">
+                                        <Plus size={15}/> Create alert</button>
+                                        </form>
+                                        <div className="alert-list">{loading?<div className="page-card">Loading alerts...</div>:!alerts.length?<div className="page-card">
+                                            <Bell size={38}/>
+                                            <h3>No alerts yet</h3>
+                                            <p>Create one above to keep a saved search.</p>
+                                            </div>:alerts.map(a=><div className="alert-row" key={a.id}>
+                                                <Bell size={22}/>
+                                                <div>
+                                                    <b>{a.name}</b>
+                                                    <p>{a.keywords||'Any role'} {a.location&&`· ${a.location}`} {a.remote&&'· Remote'}</p>
+                                                    <small>{a.frequency} · {a.is_active?'Active':'Paused'}</small></div>
+                                                    <button onClick={()=>toggle(a.id)} className={`toggle ${a.is_active?'on':''}`}>{a.is_active?'Active':'Paused'}
+                                                        </button>
+                                                        <button className="save-icon" onClick={()=>remove(a.id)}>
+                                                            <Trash2 size={18}/>
+                                                            </button>
+                                                            </div>)}
+                                                            </div>
+                                                            </div>}
